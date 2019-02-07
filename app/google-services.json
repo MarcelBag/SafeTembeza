@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1073210604098",
+    "firebase_url": "https://temebeza-4b2de.firebaseio.com",
+    "project_id": "temebeza-4b2de",
+    "storage_bucket": "temebeza-4b2de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1073210604098:android:166eda21a92fffa9",
+        "android_client_info": {
+          "package_name": "com.example.irmarcelbag.tembeza"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1073210604098-88ei7mj9d534cfj6e3vcpv3l1bcqlim9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.irmarcelbag.tembeza",
+            "certificate_hash": "07444dc5aba288b718cc1d0a82891a9ec59011a6"
+          }
+        },
+        {
+          "client_id": "1073210604098-7helfj25edsg8r6qfggjt7ufintebura.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR66ErQjvvdlMXJSGJdKchWquqA1D-ANk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1073210604098-7helfj25edsg8r6qfggjt7ufintebura.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
