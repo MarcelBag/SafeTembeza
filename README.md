@@ -1,3 +1,6 @@
 # SafeTembeza
-Tembeza is a project that is still in the beginning for helping people doing business online in DRCongo. 
-As soon as you have some ideas you can support us. We need sponsor of this project. Regards.
+Tembeza is my final year project that will help congolese dealing with online taxi and ridesharing which 
+we hope will reduce insecurity by identifying drivers and boda bodas in DRCongo. 
+The project is still in the development.
+As soon as you have an idea you can support us.
+
