@@ -17,6 +17,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.PermissionListener;
+
+import java.util.List;
 
 //import com.google.android.gms.maps.CameraUpdate;
 
@@ -39,6 +49,20 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_map);
+
+
+//        Dexter.withActivity(this)
+//                .withPermissions(
+//                        Manifest.permission.CAMERA,
+//                        Manifest.permission.READ_CONTACTS,
+//                        Manifest.permission.RECORD_AUDIO
+//
+//                ).withListener(new MultiplePermissionsListener() {
+//            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {/* ... */}
+//            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {/* ... */}
+//        }).check();
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -58,6 +82,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.isMyLocationEnabled();
+        mMap.getUiSettings().setAllGesturesEnabled(true);
+
 
         /**
          *Making the application to locate the devices where is located
@@ -85,7 +112,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        mGoogleApiClient.connect();
+        bag.connect();
     }
     @Override
     public void onLocationChanged(Location location) {
@@ -110,7 +137,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         /**
          * We set a priority of the activity which consume a lot of Battery to take the real as possible Accuracy
          */
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+       // mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         /**
          * We test this first otherwise we're going to try the lowest
          */
@@ -130,15 +157,9 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             return;
         }
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
      //   LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
     }
-
-
-
-
-
-
     
 
     @Override

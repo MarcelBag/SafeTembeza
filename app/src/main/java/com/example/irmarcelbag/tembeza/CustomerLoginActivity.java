@@ -68,6 +68,7 @@ public class CustomerLoginActivity extends AppCompatActivity {
                             DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(user_id);
                             //Setting the Database Reference so that it save to Database
                             current_user_db.setValue(true);
+                            //current_user_db.setValue(true);
                         }
                     }
                 });
