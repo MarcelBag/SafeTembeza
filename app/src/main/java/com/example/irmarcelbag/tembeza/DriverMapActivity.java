@@ -7,7 +7,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -17,16 +20,21 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+//import com.karumi.dexter.Dexter;
+//import com.karumi.dexter.MultiplePermissionsReport;
+//import com.karumi.dexter.PermissionToken;
+//import com.karumi.dexter.listener.PermissionDeniedResponse;
+//import com.karumi.dexter.listener.PermissionGrantedResponse;
+//import com.karumi.dexter.listener.PermissionRequest;
+//import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+//import com.karumi.dexter.listener.single.PermissionListener;
+//
+//import java.util.List;
 
-import java.util.List;
+import static com.google.firebase.database.FirebaseDatabase.*;
 
 //import com.google.android.gms.maps.CameraUpdate;
 
@@ -116,14 +124,26 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     }
     @Override
     public void onLocationChanged(Location location) {
+       Toast.makeText(getApplicationContext(), "Location changed", Toast.LENGTH_LONG).show();
         //Now trying to update location
         mLastLocation = location;
    //     LatLng lating = new LatLng(location.getAltitude(), location.getLatitude());
         LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-        //Now trying to move the camera(the google location ) when the user (device) is moving
+        //Moving the camera(the google location ) when the user (device) is moving
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         // trying to specify the use
         mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
+
+        //Making the firebase connection to save the longitude and latitude of the user
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //Creating the database reference
+        //DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DrversAvailable");
+
+        /* Using GeoFire saving Values to the Database with his own way */
+        GeoFire geoFire = new GeoFire(ref); // Database reference with value of geofire
+        geoFire.setLocation(userId, new GeoLocation(location.getLatitude(), location.getLongitude()));
 
     }
 
@@ -137,7 +157,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         /**
          * We set a priority of the activity which consume a lot of Battery to take the real as possible Accuracy
          */
-       // mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+       mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         /**
          * We test this first otherwise we're going to try the lowest
          */
@@ -157,8 +177,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             return;
         }
 
-        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-     //   LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
+       // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
     
 
@@ -170,6 +189,20 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+    // Knowing when the user is available we call on stop
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //Making the firebase conncetion to save the longitude and latitude of the user
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        //Creating the database reference
+        DatabaseReference ref = getInstance().getReference("DriversAvailable");
+        //Using GeoFire saving Values to the Database with his own way
+        GeoFire geoFire = new GeoFire(ref); // Database reference with value of
+        //when the user is getting out the activity we're removing the location in the database
+        geoFire.removeLocation(userId);
     }
 
 }

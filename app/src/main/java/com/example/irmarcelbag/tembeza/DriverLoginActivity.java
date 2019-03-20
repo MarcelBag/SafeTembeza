@@ -20,17 +20,18 @@ import com.google.firebase.database.FirebaseDatabase;
 public class DriverLoginActivity extends AppCompatActivity {
     private EditText mEmail, mPassword;
     private Button mLogin, mRegistration;
-    //Get the Database Library from FireBqse
+    //Get the Database Library from FireBase
     private FirebaseAuth nAuth;
     //A listener of when the status change
     //private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     //private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_login);
-        //Calling the instance
+        //Calling the Firebase Instance
         nAuth = FirebaseAuth.getInstance();
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -65,9 +66,12 @@ public class DriverLoginActivity extends AppCompatActivity {
                           // Putting the ID of The User in FB Database in ==>Users ===Riders child
                           //First Getting the User ID
                           String user_id = nAuth.getCurrentUser().getUid();
-                          DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(user_id);
+                          //DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Drivers").child(user_id);
                          //Setting the Database Reference so that it save to Database
-                          current_user_db.setValue(true);
+                         // current_user_db.setValue(true);
+                          mDatabase  = FirebaseDatabase.getInstance().getReference();
+                          mDatabase.child("Users").child(user_id).setValue("Drivers");
+
                       }
                   }
               });

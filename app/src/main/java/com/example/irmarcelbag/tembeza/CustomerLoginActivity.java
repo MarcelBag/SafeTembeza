@@ -18,19 +18,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class CustomerLoginActivity extends AppCompatActivity {
-
     private EditText mEmail, mPassword;
     private Button mLogin, mRegistration;
-    //Get the Database Library from FB
+    //Get the Database Library from FireBase
     private FirebaseAuth nAuth;
     //A listener of when the status change
+    //private FirebaseAuth.AuthStateListener firebaseAuthListener;
     private FirebaseAuth.AuthStateListener firebaseAuthListener;
     //private FirebaseAuth.AuthStateListener firebaseAuthListener;
+    private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_login);
-        //Calling the instance
+        //Calling the Firebase Instance
         nAuth = FirebaseAuth.getInstance();
         firebaseAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -65,16 +66,19 @@ public class CustomerLoginActivity extends AppCompatActivity {
                             // Putting the ID of The User in FB Database in ==>Users ===Riders child
                             //First Getting the User ID
                             String user_id = nAuth.getCurrentUser().getUid();
-                            DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(user_id);
+                          //  DatabaseReference current_user_db = FirebaseDatabase.getInstance().getReference().child("Users").child("Customers").child(user_id);
                             //Setting the Database Reference so that it save to Database
-                            current_user_db.setValue(true);
-                            //current_user_db.setValue(true);
+//                          current_user_db.setValue(true);
+                           // current_user_db.setValue(true);
+                            mDatabase  = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.child("Users").child(user_id).setValue("Customers");
+                          //  mDatabase.child("Users").child("Customers").child(user_id);
                         }
                     }
                 });
             }
         });
-        //Login Button if the Sign in is fail is going to cal the next page
+        //Login Button if the Sign in is fail is going to call the next page
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,7 +102,7 @@ public class CustomerLoginActivity extends AppCompatActivity {
         super.onStart();
         nAuth.addAuthStateListener(firebaseAuthListener);
     }
-    // Stop the activity when we leave
+    // Stop the activity when w leave
     @Override
     protected void onStop() {
         super.onStop();
