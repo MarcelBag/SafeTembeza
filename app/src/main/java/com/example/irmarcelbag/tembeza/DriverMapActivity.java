@@ -52,6 +52,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     Location mLastLocation;
     LocationRequest mLocationRequest;
+    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,10 +139,10 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         //Making the firebase connection to save the longitude and latitude of the user
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-        //DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DrversAvailable");
-
-        /* Using GeoFire saving Values to the Database with his own way */
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+       // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DrversAvailable");
+//        mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+//        /* Using GeoFire saving Values to the Database with his own way */
         GeoFire geoFire = new GeoFire(ref); // Database reference with value of geofire
         geoFire.setLocation(userId, new GeoLocation(location.getLatitude(), location.getLongitude()));
 
@@ -195,10 +196,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     protected void onStop() {
         super.onStop();
-        //Making the firebase conncetion to save the longitude and latitude of the user
+        //Making the firebase connection to save the longitude and latitude of the user
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-        DatabaseReference ref = getInstance().getReference("DriversAvailable");
+      DatabaseReference ref = getInstance().getReference("DriversAvailable");
+       // mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+
         //Using GeoFire saving Values to the Database with his own way
         GeoFire geoFire = new GeoFire(ref); // Database reference with value of
         //when the user is getting out the activity we're removing the location in the database
