@@ -1,5 +1,6 @@
 package com.example.irmarcelbag.tembeza;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -7,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -23,20 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-//import com.karumi.dexter.Dexter;
-//import com.karumi.dexter.MultiplePermissionsReport;
-//import com.karumi.dexter.PermissionToken;
-//import com.karumi.dexter.listener.PermissionDeniedResponse;
-//import com.karumi.dexter.listener.PermissionGrantedResponse;
-//import com.karumi.dexter.listener.PermissionRequest;
-//import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-//import com.karumi.dexter.listener.single.PermissionListener;
-//
-//import java.util.List;
 
-import static com.google.firebase.database.FirebaseDatabase.*;
-
-//import com.google.android.gms.maps.CameraUpdate;
 
 // Implementing the Google location so that when when the map is connected and the request have been created
 // it get the current location
@@ -53,6 +43,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private DatabaseReference mDatabase;
+    private Button mLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,22 +51,21 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         setContentView(R.layout.activity_driver_map);
 
 
-//        Dexter.withActivity(this)
-//                .withPermissions(
-//                        Manifest.permission.CAMERA,
-//                        Manifest.permission.READ_CONTACTS,
-//                        Manifest.permission.RECORD_AUDIO
-//
-//                ).withListener(new MultiplePermissionsListener() {
-//            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {/* ... */}
-//            @Override public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {/* ... */}
-//        }).check();
-
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //Setting the button when clicking the logout with firebase's way
+        mLogout = (Button) findViewById(R.id.logout);
+        mLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(DriverMapActivity.this, MainActivity.class);
+                startActivity(intent);
+                return;
+            }
+        });
     }
 
 
@@ -123,9 +113,11 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .build();
         bag.connect();
     }
+
+
     @Override
     public void onLocationChanged(Location location) {
-       Toast.makeText(getApplicationContext(), "Location changed", Toast.LENGTH_LONG).show();
+       Toast.makeText(DriverMapActivity.this, "Location "+ location, Toast.LENGTH_LONG).show();
         //Now trying to update location
         mLastLocation = location;
    //     LatLng lating = new LatLng(location.getAltitude(), location.getLatitude());
@@ -137,14 +129,14 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
 
         //Making the firebase connection to save the longitude and latitude of the user
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
-       // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DrversAvailable");
-//        mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
-//        /* Using GeoFire saving Values to the Database with his own way */
-        GeoFire geoFire = new GeoFire(ref); // Database reference with value of geofire
-        geoFire.setLocation(userId, new GeoLocation(location.getLatitude(), location.getLongitude()));
+      // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+
+        mDatabase = (FirebaseDatabase.getInstance().getReference("DriversAvailable")); /* Using GeoFire saving Values to the Database with his own way */
+
+        GeoFire geoFire = new GeoFire(mDatabase); // Database reference with value of geofire
+        geoFire.setLocation(user_id, new GeoLocation(location.getLatitude(), location.getLongitude()));
 
     }
 
@@ -178,7 +170,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             return;
         }
 
-       // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
     
 
@@ -197,15 +189,15 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     protected void onStop() {
         super.onStop();
         //Making the firebase connection to save the longitude and latitude of the user
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-      DatabaseReference ref = getInstance().getReference("DriversAvailable");
-       // mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+     // DatabaseReference ref = getInstance().getReference("DriversAvailable");
+        mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
 
         //Using GeoFire saving Values to the Database with his own way
-        GeoFire geoFire = new GeoFire(ref); // Database reference with value of
+        GeoFire geoFire = new GeoFire(mDatabase); // Database reference with value of
         //when the user is getting out the activity we're removing the location in the database
-        geoFire.removeLocation(userId);
+        geoFire.removeLocation(user_id);
     }
 
 }
