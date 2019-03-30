@@ -27,6 +27,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Objects;
+
 
 // Implementing the Google location so that when when the map is connected and the request have been created
 // it get the current location
@@ -56,39 +58,24 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //Setting the button when clicking the logout with firebase's way
-        mLogout = (Button) findViewById(R.id.logout);
+        mLogout = findViewById(R.id.logout);
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(DriverMapActivity.this, MainActivity.class);
                 startActivity(intent);
-                return;
+                //return;
             }
         });
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.isMyLocationEnabled();
         mMap.getUiSettings().setAllGesturesEnabled(true);
-
-
-        /**
-         *Making the application to locate the devices where is located
-         * with a lowest accuracy and check it
-         */
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -106,12 +93,17 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     //Creating the function of buildGoogleApiClient
     protected synchronized void buildGoogleApiClient(){
         // Trying to validate the API Client
-        GoogleApiClient bag = new GoogleApiClient.Builder(this)
+         new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        bag.connect();
+//        //bag.connect();
+//        new GoogleApiClient.Builder(this)
+//                .addApi(LocationServices.API)
+//                .addConnectionCallbacks(this)
+//                .addOnConnectionFailedListener(this)
+//                .build();
     }
 
 
@@ -129,7 +121,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
 
         //Making the firebase connection to save the longitude and latitude of the user
-        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String user_id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+       // String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
       // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
 
@@ -147,32 +140,19 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         //1000 mille second which is one seconds
         mLocationRequest.setInterval(1000);
         mLocationRequest.setFastestInterval(1000);
-        /**
-         * We set a priority of the activity which consume a lot of Battery to take the real as possible Accuracy
-         */
+       //Setting a low battery consumer accuracy
        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        /**
-         * We test this first otherwise we're going to try the lowest
-         */
+
         // mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
 
-
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            /** TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-             */
 
-            return;
+            //return;
         }
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+       //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
-    
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -189,7 +169,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     protected void onStop() {
         super.onStop();
         //Making the firebase connection to save the longitude and latitude of the user
-        String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String user_id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        //String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
      // DatabaseReference ref = getInstance().getReference("DriversAvailable");
         mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");

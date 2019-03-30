@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Tembeza</string>
     <string name="title_activity_driver_map">Map</string>
+    <string name="logout">Logout</string>
+    <string name="driver">Driver</string>
+    <string name="client">Client</string>
 </resources>
