@@ -16,6 +16,9 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+//import com.google.android.gms.common.api.PendingResult;
+//import com.google.android.gms.common.api.Status;
+//import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,8 +29,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.Objects;
+
+//import static com.google.firebase.database.FirebaseDatabase.getInstance;
 
 
 // Implementing the Google location so that when when the map is connected and the request have been created
@@ -40,12 +44,12 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     //GoogleApiClient client = new GoogleApiClient.Builder(this)
 
-    //  GoogleApiClient mGoogleApiClient;
 
     Location mLastLocation;
     LocationRequest mLocationRequest;
     private DatabaseReference mDatabase;
     private Button mLogout;
+    /* private FusedLocationProviderClient fusedLocationClient; */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +70,13 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 Intent intent = new Intent(DriverMapActivity.this, MainActivity.class);
                 startActivity(intent);
                 //return;
+
             }
         });
+        //Creating the fuse location
+     //mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+       //fusedLocationClient  = LocationServices.getFusedLocationProviderClient(this);
+
     }
 
 
@@ -77,13 +86,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         mMap.isMyLocationEnabled();
         mMap.getUiSettings().setAllGesturesEnabled(true);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return;
         }
         buildGoogleApiClient();
@@ -109,7 +112,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onLocationChanged(Location location) {
-       Toast.makeText(DriverMapActivity.this, "Location "+ location, Toast.LENGTH_LONG).show();
+       Toast.makeText(DriverMapActivity.this, "TestLocation "+ location, Toast.LENGTH_LONG).show();
         //Now trying to update location
         mLastLocation = location;
    //     LatLng lating = new LatLng(location.getAltitude(), location.getLatitude());
@@ -121,17 +124,18 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
 
         //Making the firebase connection to save the longitude and latitude of the user
-        String user_id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-       // String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        String user_id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+       String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-      // DatabaseReference ref = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+     // DatabaseReference ref = getInstance().getReference("DriversAvailable");
 
         mDatabase = (FirebaseDatabase.getInstance().getReference("DriversAvailable")); /* Using GeoFire saving Values to the Database with his own way */
 
         GeoFire geoFire = new GeoFire(mDatabase); // Database reference with value of geofire
-        geoFire.setLocation(user_id, new GeoLocation(location.getLatitude(), location.getLongitude()));
+        geoFire.setLocation(userId, new GeoLocation(location.getLatitude(), location.getLongitude()));
 
     }
+    
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -147,10 +151,13 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            //return;
+            return;
         }
+    //Getting the refreshment of the location instead of getting a location once it will be refresh in a 1000milliseconde which equal to 1 second
 
-       //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+
     }
 
 
@@ -169,16 +176,16 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     protected void onStop() {
         super.onStop();
         //Making the firebase connection to save the longitude and latitude of the user
-        String user_id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        //String user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        //String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         //Creating the database reference
-     // DatabaseReference ref = getInstance().getReference("DriversAvailable");
-        mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
+     //DatabaseReference ref = getInstance().getReference("DriversAvailable");
+       mDatabase = FirebaseDatabase.getInstance().getReference("DriversAvailable");
 
         //Using GeoFire saving Values to the Database with his own way
         GeoFire geoFire = new GeoFire(mDatabase); // Database reference with value of
         //when the user is getting out the activity we're removing the location in the database
-        geoFire.removeLocation(user_id);
+        geoFire.removeLocation(userId);
     }
 
 }
